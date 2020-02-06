@@ -22,12 +22,11 @@ String packet = "";
 #define button_pin 6
 int buttonState = 0; 
 
-void send_message(String message)
+void send_message()
 {
   String out;
   packet = "";
   packet.concat(header);
-  packet.concat(message);
 
   // cast pointer to unsigned character and send
   rf95.send((uint8_t*)packet.c_str(), PACKET_SIZE);
@@ -83,10 +82,9 @@ void setup()
 
 void loop()
 {
-  String message = "";
   buttonState = digitalRead(button_pin);
   if(buttonState == HIGH) {
-    send_message(message);
+    send_message();
   }
   delay(10); // breathing room
 }

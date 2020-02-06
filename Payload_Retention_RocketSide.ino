@@ -13,27 +13,22 @@
 #define RFM95_RST  3
 #define RFM95_FREQ 433.0 //in MHz
 #define RFM95_TP   23 //Transmit Power in dB; 23 is maximum
-
-RH_RF95 rf95(RFM95_CS, RFM95_G0);// radio driver
-
 #define PACKET_SIZE 86
 
-String packet;
+RH_RF95 rf95(RFM95_CS, RFM95_G0);// radio driver
 const String header = "TRJY";
+String packet = "";
 
-String send_and_listen(String message)
+//Step Motor Driver Pin Mappings and Settings
+#define STEP_MOTOR_1_STEP 4
+#define STEP_MOTOR_1_DIR  5
+#define STEP_MOTOR_2_STEP 6
+#define STEP_MOTOR_2_DIR  7
+#define STEPS_PER_REV     200
+
+String recieve()
 {
-  String out;
-  packet = "";
-  packet.concat(header);
-  packet.concat(message);
-
-  // cast pointer to unsigned character and send
-  rf95.send((uint8_t*)packet.c_str(), PACKET_SIZE);
-
-  // wait for send to finish
-  rf95.waitPacketSent();
-
+  String out = "";
   // check for a response
   uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
   uint8_t len = RH_RF95_MAX_MESSAGE_LEN;
@@ -60,6 +55,28 @@ String send_and_listen(String message)
   return out;
 }
 
+// clockwise means looking at axle it turns clockwise; would unscrew a nail if true
+void turnRevs(int stepPin, int dirPin, bool clockwise, int revolutions)
+{
+  // Set the spinning direction
+  if(clockwise)
+  {
+    digitalWrite(dirPin, HIGH);
+  }
+  else
+  {
+    digitalWrite(dirPin, LOW);
+  }
+  // Spin the stepper motor 1 revolution slowly:
+  for (int i = 0; i < STEPS_PER_REV*revolutions; i++)
+  {
+    // These four lines result in 1 step:
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(2000); // from tests this is the most accurate time to use
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(2000);
+  }
+}
 
 void setup()
 {
@@ -86,7 +103,7 @@ void setup()
   Serial.println("LoRa radio init OK!");
 
   //set transmit frequency
-  if (!rf95.setFrequency(RFM95_FREQ))    // Make this a while loop -Rachel
+  if (!rf95.setFrequency(RFM95_FREQ))
   {
     Serial.println("setFrequency failed");
     delay(100);
@@ -95,14 +112,33 @@ void setup()
   Serial.println(RFM95_FREQ);
 
   // Set transmit power
-  rf95.setTxPower(RFM95_TP, false); // how high can this go? -Patrick
+  rf95.setTxPower(RFM95_TP, false);
+
+  Serial.println("LoRa Successfully Initialized!");
+  Serial.println("Initializing Motors...");
+
+  //sets pins for motors
+  pinMode(STEP_MOTOR_1_STEP, OUTPUT);
+  pinMode(STEP_MOTOR_1_DIR, OUTPUT);
+  pinMode(STEP_MOTOR_2_STEP, OUTPUT);
+  pinMode(STEP_MOTOR_2_DIR, OUTPUT);
+
+  Serial.println("Motors Successfully Initialized!");
+
+  Serial.println("Initialization Completed Successfully!");
 
 }
 
 void loop()
 {
-  String message = "nipples";
-  String str = send_and_listen(message);
+  String str = recieve();
+  Serial.print("Recieved message: ");
   Serial.println((char*)str.c_str());
+  if(str == header)
+  {
+    turnRevs(STEP_MOTOR_1_STEP, STEP_MOTOR_1_DIR, true, 10);
+    //turnRevs(STEP_MOTOR_2_STEP, STEP_MOTOR_2_DIR, true, 10);
+    delay(4000);
+  }
   delay(1000); // breathing room
 }
