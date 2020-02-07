@@ -19,14 +19,19 @@ RH_RF95 rf95(RFM95_CS, RFM95_G0);// radio driver
 const String header = "TRJY";
 String packet = "";
 
-#define button_pin 6
+#define FORWARD_1_PIN 6
+#define BACK_1_PIN    7
+#define FORWARD_2_PIN 8
+#define BACK_2_PIN    9
+
 int buttonState = 0; 
 
-void send_message()
+void send_message(String message)
 {
   String out;
   packet = "";
   packet.concat(header);
+  packet.concat(message);
 
   // cast pointer to unsigned character and send
   rf95.send((uint8_t*)packet.c_str(), PACKET_SIZE);
@@ -76,15 +81,30 @@ void setup()
 
   //END OF LORA
 
-  //set button pin to input
-  pinMode(button_pin, INPUT);
+  //set button pins to input
+  pinMode(FORWARD_1_PIN, INPUT);
+  pinMode(BACK_1_PIN, INPUT);
+  pinMode(FORWARD_2_PIN, INPUT);
+  pinMode(BACK_2_PIN, INPUT);
 }
 
 void loop()
 {
-  buttonState = digitalRead(button_pin);
+  buttonState = digitalRead(FORWARD_1_PIN);
   if(buttonState == HIGH) {
-    send_message();
+    send_message("FORWARD_1");
+  }
+  buttonState = digitalRead(BACK_1_PIN);
+  if(buttonState == HIGH) {
+    send_message("BACK_1");
+  }
+  buttonState = digitalRead(FORWARD_2_PIN);
+  if(buttonState == HIGH) {
+    send_message("FORWARD_2");
+  }
+  buttonState = digitalRead(BACK_2_PIN);
+  if(buttonState == HIGH) {
+    send_message("BACK_2");
   }
   delay(10); // breathing room
 }

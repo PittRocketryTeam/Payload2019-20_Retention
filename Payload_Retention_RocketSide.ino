@@ -25,6 +25,7 @@ String packet = "";
 #define STEP_MOTOR_2_STEP 6
 #define STEP_MOTOR_2_DIR  7
 #define STEPS_PER_REV     200
+#define REVS_PER_RECIEVE  10
 
 String recieve()
 {
@@ -41,6 +42,14 @@ String recieve()
     {
       Serial.println("Received something, checking header...");
       out = String((char*)buf);
+      if(out.substring(0,header.length()) == header)
+      {
+        out = out.substring(header.length());
+      }
+      else
+      {
+        out = "ERR_INVALID_HEAD";
+      }
     }
     else
     {
@@ -134,11 +143,26 @@ void loop()
   String str = recieve();
   Serial.print("Recieved message: ");
   Serial.println((char*)str.c_str());
-  if(str == header)
+  if(str == "FORWARD_1")
   {
-    turnRevs(STEP_MOTOR_1_STEP, STEP_MOTOR_1_DIR, true, 10);
-    //turnRevs(STEP_MOTOR_2_STEP, STEP_MOTOR_2_DIR, true, 10);
+    turnRevs(STEP_MOTOR_1_STEP, STEP_MOTOR_1_DIR, true, REVS_PER_RECIEVE);
     delay(4000);
   }
+  if(str == "BACK_1")
+  {
+    turnRevs(STEP_MOTOR_1_STEP, STEP_MOTOR_1_DIR, false, REVS_PER_RECIEVE);
+    delay(4000);
+  }
+  if(str == "FORWARD_2")
+  {
+    turnRevs(STEP_MOTOR_2_STEP, STEP_MOTOR_2_DIR, true, REVS_PER_RECIEVE);
+    delay(4000);
+  }
+  if(str == "BACK_2")
+  {
+    turnRevs(STEP_MOTOR_2_STEP, STEP_MOTOR_2_DIR, false, REVS_PER_RECIEVE);
+    delay(4000);
+  }
+  
   delay(1000); // breathing room
 }
