@@ -22,8 +22,10 @@ String packet = "";
 //Step Motor Driver Pin Mappings and Settings
 #define STEP_MOTOR_1_STEP 4
 #define STEP_MOTOR_1_DIR  5
+#define STEP_MOTOR_1_EN   8
 #define STEP_MOTOR_2_STEP 6
 #define STEP_MOTOR_2_DIR  7
+#define STEP_MOTOR_2_EN   9
 #define STEPS_PER_REV     200
 #define REVS_PER_RECIEVE  10
 
@@ -132,8 +134,14 @@ void setup()
   //sets pins for motors
   pinMode(STEP_MOTOR_1_STEP, OUTPUT);
   pinMode(STEP_MOTOR_1_DIR, OUTPUT);
+  pinMode(STEP_MOTOR_1_EN, OUTPUT);
   pinMode(STEP_MOTOR_2_STEP, OUTPUT);
   pinMode(STEP_MOTOR_2_DIR, OUTPUT);
+  pinMode(STEP_MOTOR_2_EN, OUTPUT);
+  
+  digitalWrite(STEP_MOTOR_1_EN, HIGH); // disables the step motor drivers until the first command is recieved (active low)
+  digitalWrite(STEP_MOTOR_2_EN, HIGH);
+  Serial.println("Step Motors Disabled");
 
   Serial.println("Motors Successfully Initialized!");
 
@@ -157,6 +165,9 @@ void loop()
   else
   {
     str = cmd; //upon initially receiving a command or receiving a command which is different from the current command being executed, update the command to that which is received
+    digitalWrite(STEP_MOTOR_1_EN, LOW); // if the first command, will enable the step motor drivers; harmless for further execution
+    digitalWrite(STEP_MOTOR_2_EN, LOW);
+    Serial.println("Step Motors Enabled");
   }
   Serial.print("Executing command: ");
   Serial.println((char*)str.c_str());
