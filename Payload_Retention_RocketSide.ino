@@ -27,6 +27,9 @@ String packet = "";
 #define STEPS_PER_REV     200
 #define REVS_PER_RECIEVE  10
 
+String cmd = "";
+String str = "";
+
 String recieve()
 {
   String out = "";
@@ -140,28 +143,42 @@ void setup()
 
 void loop()
 {
-  String str = recieve();
+  cmd = recieve();
   Serial.print("Recieved message: ");
+  Serial.println((char*)cmd.c_str());
+  if((cmd == "ERR_NO_REPLY") || (cmd == "ERR_INVALID_HEAD"))
+  {
+    //unless instructed to change, retain and execute the previous command
+  }
+  else if(cmd == str)
+  {
+    str = ""; //send same message twice to stop
+  }
+  else
+  {
+    str = cmd; //upon initially receiving a command or receiving a command which is different from the current command being executed, update the command to that which is received
+  }
+  Serial.print("Executing command: ");
   Serial.println((char*)str.c_str());
   if(str == "FORWARD_1")
   {
     turnRevs(STEP_MOTOR_1_STEP, STEP_MOTOR_1_DIR, true, REVS_PER_RECIEVE);
-    delay(4000);
+    //delay(4000);
   }
   if(str == "BACK_1")
   {
     turnRevs(STEP_MOTOR_1_STEP, STEP_MOTOR_1_DIR, false, REVS_PER_RECIEVE);
-    delay(4000);
+    //delay(4000);
   }
   if(str == "FORWARD_2")
   {
     turnRevs(STEP_MOTOR_2_STEP, STEP_MOTOR_2_DIR, true, REVS_PER_RECIEVE);
-    delay(4000);
+    //delay(4000);
   }
   if(str == "BACK_2")
   {
     turnRevs(STEP_MOTOR_2_STEP, STEP_MOTOR_2_DIR, false, REVS_PER_RECIEVE);
-    delay(4000);
+    //delay(4000);
   }
   
   delay(1000); // breathing room
