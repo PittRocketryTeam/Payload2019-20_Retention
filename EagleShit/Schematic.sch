@@ -11042,6 +11042,27 @@ W = angled&lt;p&gt;
 <wire x1="-20.32" y1="33.02" x2="-20.32" y2="-12.7" width="0.1524" layer="91"/>
 </segment>
 </net>
+<net name="N$4" class="0">
+<segment>
+<pinref part="ARDUINO_NANO1" gate="G$1" pin="D8/CLK0"/>
+<wire x1="5.08" y1="63.5" x2="-7.62" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="-7.62" y1="63.5" x2="-7.62" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="-7.62" y1="101.6" x2="121.92" y2="101.6" width="0.1524" layer="91"/>
+<pinref part="U$1" gate="G$1" pin="/EN"/>
+<wire x1="121.92" y1="101.6" x2="121.92" y2="88.9" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$12" class="0">
+<segment>
+<pinref part="ARDUINO_NANO1" gate="G$1" pin="D9/OC1A"/>
+<wire x1="5.08" y1="60.96" x2="-22.86" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="-22.86" y1="60.96" x2="-22.86" y2="-15.24" width="0.1524" layer="91"/>
+<wire x1="-22.86" y1="-15.24" x2="114.3" y2="-15.24" width="0.1524" layer="91"/>
+<wire x1="114.3" y1="-15.24" x2="114.3" y2="45.72" width="0.1524" layer="91"/>
+<pinref part="U$2" gate="G$1" pin="/EN"/>
+<wire x1="114.3" y1="45.72" x2="121.92" y2="45.72" width="0.1524" layer="91"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>
